@@ -83,6 +83,16 @@ return {
     },
   },
 
+  -- surround
+  {
+    "kylechui/nvim-surround",
+    version = "*",
+    event = "VeryLazy",
+    config = function()
+      require("nvim-surround").setup({})
+    end,
+  },
+
   -- auto pairs
   {
     "windwp/nvim-autopairs",
