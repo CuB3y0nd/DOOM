@@ -1,0 +1,2 @@
+# DOOM
+My nvim configuration
