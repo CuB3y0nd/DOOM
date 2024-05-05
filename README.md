@@ -60,3 +60,8 @@ The SOTA core configuration for NeoVim!
 
 TODO
 
+
+## License
+
+[MIT](https://github.com/CuB3y0nd/DOOM/blob/master/LICENSE) © [CuB3y0nd](https://www.cubeyond.net)
+
