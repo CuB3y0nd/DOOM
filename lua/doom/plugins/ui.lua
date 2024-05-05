@@ -33,12 +33,12 @@ return {
       }
 
       dashboard.section.buttons.val = {
-        dashboard.button("e", "  New file", ":ene <BAR> startinsert<CR>"),
-        dashboard.button("f", "  Find File", ":Telescope find_files<CR>"),
-        dashboard.button("r", "  Recent Files", ":Telescope oldfiles<CR>"),
-        dashboard.button("g", "  Find Text", ":Telescope live_grep<CR>"),
-        dashboard.button("l", "󰒲  Lazy", ":Lazy<CR>"),
-        dashboard.button("q", "󰅚  Quit NVIM", ":qa<CR>"),
+        dashboard.button("<SPACE> e", "  New file", ":ene <BAR> startinsert<CR>"),
+        dashboard.button("<SPACE> f", "  Find File", ":Telescope find_files<CR>"),
+        dashboard.button("<SPACE> r", "  Recent Files", ":Telescope oldfiles<CR>"),
+        dashboard.button("<SPACE> g", "  Find Text", ":Telescope live_grep<CR>"),
+        dashboard.button("<SPACE> l", "󰒲  Lazy", ":Lazy<CR>"),
+        dashboard.button("<SPACE> q", "󰅚  Quit NVIM", ":qa<CR>"),
       }
 
       alpha.setup(dashboard.opts)
