@@ -6,7 +6,7 @@ The SOTA core configuration for NeoVim!
 
 ![Shot-2024-05-05-145017](https://github.com/CuB3y0nd/DOOM/assets/91041570/67ba319c-e381-4029-9c2e-be2f3fe14ea5)
 
-![Shot-2024-05-05-150050](https://github.com/CuB3y0nd/DOOM/assets/91041570/ead8bf4a-55c4-433f-ae9d-7a5efe55110d)
+![Shot-2024-05-05-151825](https://github.com/CuB3y0nd/DOOM/assets/91041570/ddaf2d26-4848-4a15-b68e-c1253dec5aee)
 
 ![Shot-2024-05-05-150806](https://github.com/CuB3y0nd/DOOM/assets/91041570/216638c9-54eb-43cc-b142-cde213133859)
 
