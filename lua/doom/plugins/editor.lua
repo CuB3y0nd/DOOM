@@ -5,25 +5,24 @@ return {
     event = "VeryLazy",
     opts = {
       plugins = { spelling = true },
-      defaults = {
-        ["g"] = { name = "+goto" },
-        ["z"] = { name = "+fold" },
-        ["]"] = { name = "+next" },
-        ["["] = { name = "+prev" },
-        ["<leader>b"] = { name = "+buffer" },
-        ["<leader>c"] = { name = "+code" },
-        ["<Leader>f"] = { name = "+file/find" },
-        ["<leader>g"] = { name = "+git" },
-        ["<leader>gh"] = { name = "+hunks" },
-        ["<Leader>s"] = { name = "+search" },
-        ["<leader>u"] = { name = "+ui" },
-        ["<leader>x"] = { name = "+diagnostics/quickfix" },
-      },
     },
     config = function(_, opts)
       local wk = require("which-key")
       wk.setup(opts)
-      wk.register(opts.defaults)
+      wk.add({
+        { "<Leader>f", group = "+file/find" },
+        { "<Leader>s", group = "+search" },
+        { "<leader>b", group = "+buffer" },
+        { "<leader>c", group = "+code" },
+        { "<leader>g", group = "+git" },
+        { "<leader>gh", group = "+hunks" },
+        { "<leader>u", group = "+ui" },
+        { "<leader>x", group = "+diagnostics/quickfix" },
+        { "[", group = "+prev" },
+        { "]", group = "+next" },
+        { "g", group = "+goto" },
+        { "z", group = "+fold" },
+      })
     end,
   },
 
