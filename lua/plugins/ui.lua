@@ -60,9 +60,16 @@ return {
   },
 
   {
-    "lukas-reineke/indent-blankline.nvim",
-    opts = function(_, opts)
-      opts.scope = { show_start = true, show_end = true }
-    end,
+    "snacks.nvim",
+    opts = {
+      indent = {
+        enabled = true,
+        priority = 1,
+        chunk = {
+          enabled = true,
+          priority = 200,
+        },
+      },
+    },
   },
 }
