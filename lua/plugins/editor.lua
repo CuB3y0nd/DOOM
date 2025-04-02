@@ -12,6 +12,12 @@ return {
           with_expanders = false,
         },
       }
+
+      opts.filesystem = {
+        filtered_items = {
+          visible = true,
+        },
+      }
     end,
   },
 }
