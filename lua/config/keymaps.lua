@@ -1,7 +1,3 @@
--- Keymaps are automatically loaded on the VeryLazy event
--- Default keymaps that are always set: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/keymaps.lua
--- Add any additional keymaps here
-
 local cmp_enabled = true
 vim.keymap.set("n", "<leader>cc", function()
   local ok, cmp = pcall(require, "cmp")
@@ -36,3 +32,7 @@ vim.keymap.set("n", "<leader>cL", function()
     vim.notify("LSP stopped")
   end
 end, { desc = "Toggle all LSP clients" })
+
+-- vim.keymap.set("n", "<leader>e", function()
+--   Snacks.explorer()
+-- end, { desc = "Snacks Explorer" })
