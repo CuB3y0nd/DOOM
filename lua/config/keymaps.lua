@@ -40,6 +40,9 @@ vim.keymap.set("n", "<leader>cP", function()
     return
   end
 
+  local excluded_patterns =
+    { "node_modules/", ".git/", "target/", "vendor/", "dist/", "build/", "tests/", "cmake/", "doc/" }
+
   vim.ui.input({ prompt = "Format directory: ", default = ".", completion = "dir" }, function(input)
     if not input or input == "" then
       return
@@ -58,6 +61,22 @@ vim.keymap.set("n", "<leader>cP", function()
       local target_dir = vim.fn.fnamemodify(input, ":p"):gsub("/$", "")
       files = vim.fn.split(vim.fn.system("find " .. target_dir .. " -type f"), "\n")
     end
+
+    -- Filter excluded patterns
+    local filtered_files = {}
+    for _, file in ipairs(files) do
+      local is_excluded = false
+      for _, pattern in ipairs(excluded_patterns) do
+        if file:find(pattern, 1, true) then
+          is_excluded = true
+          break
+        end
+      end
+      if not is_excluded then
+        table.insert(filtered_files, file)
+      end
+    end
+    files = filtered_files
 
     if #files == 0 then
       vim.notify("No file found: " .. input, vim.log.levels.WARN)
@@ -97,3 +116,4 @@ vim.keymap.set("n", "<leader>cP", function()
     vim.notify("Successfully formatted " .. count .. " files.", vim.log.levels.INFO)
   end)
 end, { desc = "Format directory" })
+
