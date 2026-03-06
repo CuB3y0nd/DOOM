@@ -40,8 +40,21 @@ vim.keymap.set("n", "<leader>cP", function()
     return
   end
 
-  local excluded_patterns =
-    { "node_modules/", ".git/", "target/", "vendor/", "dist/", "build/", "tests/", "cmake/", "doc/" }
+  local excluded_patterns = {
+    dirs = {
+      ".git/",
+      "test/",
+      "cmake/",
+      "m4/",
+      "tools/",
+      "html/",
+      "doc/",
+      "man/",
+    },
+    files = {},
+    exts = { [".md"] = true, [".txt"] = true },
+    patterns = { "^Makefile.*" },
+  }
 
   vim.ui.input({ prompt = "Format directory: ", default = ".", completion = "dir" }, function(input)
     if not input or input == "" then
@@ -50,70 +63,95 @@ vim.keymap.set("n", "<leader>cP", function()
 
     local root = vim.fn.system("git rev-parse --show-toplevel"):gsub("\n", "")
     local is_git = (vim.v.shell_error == 0)
+    local raw_files = is_git and vim.fn.systemlist("git ls-files --full-name " .. input) or {}
 
-    local files = {}
-    if is_git then
-      local git_files = vim.fn.systemlist("git ls-files --full-name " .. input)
-      for _, f in ipairs(git_files) do
-        table.insert(files, root .. "/" .. f)
-      end
-    else
+    if not is_git then
       local target_dir = vim.fn.fnamemodify(input, ":p"):gsub("/$", "")
-      files = vim.fn.split(vim.fn.system("find " .. target_dir .. " -type f"), "\n")
+      raw_files = vim.fn.split(vim.fn.system("find " .. target_dir .. " -type f"), "\n")
+    else
+      for i, f in ipairs(raw_files) do
+        raw_files[i] = root .. "/" .. f
+      end
     end
 
-    -- Filter excluded patterns
-    local filtered_files = {}
-    for _, file in ipairs(files) do
-      local is_excluded = false
-      for _, pattern in ipairs(excluded_patterns) do
-        if file:find(pattern, 1, true) then
-          is_excluded = true
-          break
+    local files_to_format = {}
+    local formatters_by_ft = conform.formatters_by_ft or {}
+
+    for _, file in ipairs(raw_files) do
+      local filename = vim.fn.fnamemodify(file, ":t")
+      local is_excluded = excluded_patterns.files[filename]
+
+      if not is_excluded then
+        for _, dir in ipairs(excluded_patterns.dirs) do
+          if file:find(dir, 1, true) then
+            is_excluded = true
+            break
+          end
         end
       end
+
       if not is_excluded then
-        table.insert(filtered_files, file)
+        for ext in pairs(excluded_patterns.exts) do
+          if file:sub(-#ext) == ext then
+            is_excluded = true
+            break
+          end
+        end
+      end
+
+      if not is_excluded then
+        for _, pat in ipairs(excluded_patterns.patterns) do
+          if filename:match(pat) then
+            is_excluded = true
+            break
+          end
+        end
+      end
+
+      if not is_excluded then
+        local ft = vim.filetype.match({ filename = file })
+        if ft and (formatters_by_ft[ft] or formatters_by_ft["*"] or formatters_by_ft["_"]) then
+          table.insert(files_to_format, file)
+        end
       end
     end
-    files = filtered_files
 
-    if #files == 0 then
-      vim.notify("No file found: " .. input, vim.log.levels.WARN)
+    if #files_to_format == 0 then
+      vim.notify("No formatable files found.", vim.log.levels.WARN)
       return
     end
 
-    vim.notify("Formatting " .. #files .. " files...", vim.log.levels.INFO)
-
     local count = 0
-    for _, full_path in ipairs(files) do
-      if vim.fn.filereadable(full_path) == 1 then
-        local bufnr = vim.fn.bufnr(full_path)
-        local loaded = (bufnr ~= -1)
-        if not loaded then
-          bufnr = vim.fn.bufadd(full_path)
+    local total = #files_to_format
+    vim.notify(string.format("Formatting %d files...", total), vim.log.levels.INFO)
+
+    for i, path in ipairs(files_to_format) do
+      if vim.fn.filereadable(path) == 1 then
+        local bufnr = vim.fn.bufnr(path)
+        local was_loaded = (bufnr ~= -1 and vim.api.nvim_buf_is_loaded(bufnr))
+        if not was_loaded then
+          bufnr = vim.fn.bufadd(path)
           vim.fn.bufload(bufnr)
         end
 
         vim.api.nvim_buf_call(bufnr, function()
-          if vim.bo.filetype == "" then
-            vim.cmd("filetype detect")
-          end
-
           local ok_fmt = pcall(conform.format, { bufnr = bufnr, async = false, lsp_fallback = true })
-          if ok_fmt then
+          if ok_fmt and vim.api.nvim_buf_get_option(bufnr, "modified") then
             vim.cmd("silent! write")
             count = count + 1
           end
         end)
 
-        if not loaded then
+        if not was_loaded then
           vim.api.nvim_buf_delete(bufnr, { force = true })
         end
       end
+
+      if i % 10 == 0 then
+        vim.cmd("redraw")
+      end
     end
 
-    vim.notify("Successfully formatted " .. count .. " files.", vim.log.levels.INFO)
+    vim.notify(string.format("Done! Formatted %d/%d files.", count, total), vim.log.levels.INFO)
   end)
 end, { desc = "Format directory" })
-
