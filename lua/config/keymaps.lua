@@ -63,15 +63,16 @@ vim.keymap.set("n", "<leader>cP", function()
 
     local root = vim.fn.system("git rev-parse --show-toplevel"):gsub("\n", "")
     local is_git = (vim.v.shell_error == 0)
-    local raw_files = is_git and vim.fn.systemlist("git ls-files --full-name " .. input) or {}
+    local raw_files = {}
 
-    if not is_git then
-      local target_dir = vim.fn.fnamemodify(input, ":p"):gsub("/$", "")
-      raw_files = vim.fn.split(vim.fn.system("find " .. target_dir .. " -type f"), "\n")
-    else
+    if is_git then
+      raw_files = vim.fn.systemlist("git ls-files --cached --others --exclude-standard --full-name " .. input)
       for i, f in ipairs(raw_files) do
         raw_files[i] = root .. "/" .. f
       end
+    else
+      local target_dir = vim.fn.fnamemodify(input, ":p"):gsub("/$", "")
+      raw_files = vim.fn.split(vim.fn.system("find " .. target_dir .. " -type f"), "\n")
     end
 
     local files_to_format = {}
@@ -155,3 +156,4 @@ vim.keymap.set("n", "<leader>cP", function()
     vim.notify(string.format("Done! Formatted %d/%d files.", count, total), vim.log.levels.INFO)
   end)
 end, { desc = "Format directory" })
+
