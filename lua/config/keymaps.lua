@@ -6,7 +6,7 @@ vim.keymap.set("n", "<leader>cP", function()
   end
 
   local excluded = {
-    dirs = { ".git/", "cmake/", "build/", "test/", "doc/", "man/", "tools/" },
+    dirs = { ".git/", "cmake/", "build/", "doc/", "man/" },
     files = {},
     exts = { [".md"] = true },
     patterns = { "^Makefile.*", "^CMakeLists.*" },
@@ -38,7 +38,7 @@ vim.keymap.set("n", "<leader>cP", function()
         raw_files[i] = root .. "/" .. f
       end
     else
-      local cmd = string.format("find %s -type f", vim.fn.shellescape(target_dir))
+      local cmd = string.format("fd . %s --type f --color never --hidden", vim.fn.shellescape(target_dir))
       raw_files = vim.fn.systemlist(cmd)
     end
 
@@ -130,3 +130,4 @@ vim.keymap.set("n", "<leader>cP", function()
     vim.notify(string.format("Formatted %d/%d files.", modified_count, total), vim.log.levels.INFO)
   end)
 end, { desc = "Batch format directory" })
+
